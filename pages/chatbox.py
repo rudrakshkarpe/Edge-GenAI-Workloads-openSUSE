@@ -23,9 +23,3 @@ def chatbox():
                     
                 )
         st.session_state["messages"].append({"role": "assistant", "message": response})
-        
-        
-        
-        
-        
-        
