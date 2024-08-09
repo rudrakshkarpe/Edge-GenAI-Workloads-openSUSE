@@ -1,6 +1,7 @@
 import streamlit as st
 
 from tabs.local_files import local_files
+from tabs.website import website
 
 def sources():
     
@@ -11,6 +12,10 @@ def sources():
     with st.expander("*Local Files*",
                      expanded=False):
         local_files()
+        
+    with st.expander("*Website*",
+                     expanded=False):
+        website()
 
         
         
