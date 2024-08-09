@@ -66,5 +66,49 @@ def rag_pipeline(uploaded_files: list = None):
         st.exception(error)
         st.stop()
 
+    # load files from local dir 
+    
+    if (
+        st.session_state["documents"] is not None
+        and len(st.session_state["documents"]) > 0
+    ):
+        logs.log.info("Documents are already available; skipping document loading")
+        st.caption("✔️ Processed File Data")
+    else:
+        try:
+            save_dir = os.getcwd() + "/data"
+            documents = llama_index.load_documents(save_dir)
+            st.session_state["documents"] = documents
+            st.caption("✔️ Data Processed")
+        except Exception as err:
+            logs.log.error(f"Document Load Error: {str(err)}")
+            error = err
+            st.exception(error)
+            st.stop()
+            
+    # generate index for the documents
+    try:
+        llama_index.create_query_engine(
+            st.session_state["documents"],
+        )
+        st.caption("✔️ Created File Index")
+    except Exception as err:
+        logs.log.error(f"Index Creation Error: {str(err)}")
+        error = err
+        st.exception(error)
+        st.stop()
+
+    # clean up temp files
+
+    if len(st.session_state["file_list"]) > 0:
+        try:
+            save_dir = os.getcwd() + "/data"
+            shutil.rmtree(save_dir)
+            st.caption("✔️ Removed Temp Files")
+        except Exception as err:
+            logs.log.warning(
+                f"Unable to delete data files, you may want to clean-up manually: {str(err)}"
+            )
+            pass
 
     return error  
