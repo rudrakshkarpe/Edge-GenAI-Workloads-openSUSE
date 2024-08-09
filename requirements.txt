@@ -1,0 +1,4 @@
+streamlit==1.37.1
+torch==2.4.0
+llama_index==0.10.62
+utils==1.0.2
