@@ -1,4 +1,18 @@
 streamlit==1.37.1
 torch==2.4.0
 llama_index==0.10.62
-utils==1.0.2
+ollama
+llama-index-llms-ollama
+llama-index-embeddings-huggingface
+pycryptodome
+nbconvert
+pyexiftool
+llama-index-readers-web
+html2text
+streamlit-tags
+streamlit-extras
+black
+torch
+colorama ; sys_platform == 'win32'
+ebooklib
+llama-index-core
