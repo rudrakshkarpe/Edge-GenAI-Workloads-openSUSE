@@ -28,7 +28,7 @@ def save_uploaded_file(uploaded_file: bytes, save_dir:str):
 # github repo existance confirmation
 
 
-def validate_githb_repo(reop: str):
+def validate_githb_repo(repo: str):
     
     repo_enpoint = "https://github.com/" + repo + ".git"
     
