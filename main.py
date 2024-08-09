@@ -4,11 +4,11 @@ import streamlit as st
 
 from pages.chatbox import chatbox
 
-import pages.chatbox import chatbox
-import pages.header import set_page_header
-import pages.sidebar import sidebar
-import pages.page_config import set_page_config
-import pages.page_state import set_initial_state
+from pages.chatbox import chatbox
+from pages.header import set_page_header
+from pages.sidebar import sidebar
+from pages.page_config import set_page_config
+from pages.page_state import set_initial_state
 
 
 
