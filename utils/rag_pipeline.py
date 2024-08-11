@@ -12,9 +12,11 @@ import utils.logs as logs
 
 
 def rag_pipeline(uploaded_files: list = None):
-   
-    error = None
     
+    error = None
+
+    # saving files to disk (optional)
+
     if uploaded_files is not None:
         for uploaded_file in uploaded_files:
             with st.spinner(f"Processing {uploaded_file.name}..."):
@@ -22,8 +24,8 @@ def rag_pipeline(uploaded_files: list = None):
                 func.save_uploaded_file(uploaded_file, save_dir)
 
         st.caption("✔️ Files Uploaded")
-
-# create a llama index service to use the local embeddings        
+    
+    # create llama index service context to use local embeddings 
 
     try:
         llm = ollama.create_ollama_llm(
@@ -33,12 +35,14 @@ def rag_pipeline(uploaded_files: list = None):
         )
         st.session_state["llm"] = llm
         st.caption("✔️ LLM Initialized")
-        
+
     except Exception as err:
         logs.log.error(f"Failed to setup LLM: {str(err)}")
         error = err
         st.exception(error)
         st.stop()
+
+    # choose the embedding model
 
     embedding_model = st.session_state["embedding_model"]
     hf_embedding_model = None
@@ -49,8 +53,8 @@ def rag_pipeline(uploaded_files: list = None):
     if embedding_model == "Default (bge-large-en-v1.5)":
         hf_embedding_model = "BAAI/bge-large-en-v1.5"
 
-    # if embedding_model == "Large (Salesforce/SFR-Embedding-Mistral)":
-    #     hf_embedding_model = "Salesforce/SFR-Embedding-Mistral"
+    if embedding_model == "Large (Salesforce/SFR-Embedding-Mistral)":
+        hf_embedding_model = "Salesforce/SFR-Embedding-Mistral"
 
     if embedding_model == "Other":
         hf_embedding_model = st.session_state["other_embedding_model"]
@@ -65,9 +69,9 @@ def rag_pipeline(uploaded_files: list = None):
         error = err
         st.exception(error)
         st.stop()
-
-    # load files from local dir 
     
+    # choose files from local dir
+
     if (
         st.session_state["documents"] is not None
         and len(st.session_state["documents"]) > 0
@@ -85,8 +89,9 @@ def rag_pipeline(uploaded_files: list = None):
             error = err
             st.exception(error)
             st.stop()
-            
-    # generate index for the documents
+    
+    # create index from ingest documents 
+
     try:
         llama_index.create_query_engine(
             st.session_state["documents"],
@@ -98,8 +103,9 @@ def rag_pipeline(uploaded_files: list = None):
         st.exception(error)
         st.stop()
 
-    # clean up temp files
-
+    
+    # remove files from data 
+    
     if len(st.session_state["file_list"]) > 0:
         try:
             save_dir = os.getcwd() + "/data"
@@ -111,4 +117,4 @@ def rag_pipeline(uploaded_files: list = None):
             )
             pass
 
-    return error  
+    return error  # If no errors occurred, None is returned
