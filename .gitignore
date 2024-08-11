@@ -1,0 +1,6 @@
+.streamlit/
+local-rag.log
+# pages/__pycache__/
+# tabs/__pycache__/
+# utils/__pycache__/
+__pycache__/
