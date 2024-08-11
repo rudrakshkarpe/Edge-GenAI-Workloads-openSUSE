@@ -1,19 +1,17 @@
 FROM python:3.10-slim as base
 
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONFAULTHANDLER 1
+
 FROM base AS python-deps
 
-# Install compilation dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends gcc
 
-# Install python dependencies
+# Install python depend"encies
 COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-FROM base AS runtime
-
-# Copy installed dependencies from python-deps stage
-COPY --from=python-deps /usr/local/lib/python3.10 /usr/local/lib/python3.10
-COPY --from=python-deps /usr/local/bin /usr/local/bin
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install application into container
 COPY . .
@@ -25,5 +23,7 @@ EXPOSE 8501
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 # Run the application
-ENTRYPOINT ["python", "-m", "streamlit"]
-CMD ["run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# ENTRYPOINT ["python", "-m", "streamlit"]
+# CMD ["run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+
+ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]z
