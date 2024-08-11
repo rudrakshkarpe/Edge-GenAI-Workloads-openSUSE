@@ -5,7 +5,7 @@ from typing import Union
 
 
 def setup_logger(
-    log_file: str = "local-rag.log", level: Union[int, str] = logging.INFO
+    log_file: str = "LLM-Localization.log", level: Union[int, str] = logging.INFO
 ):
     logger = logging.getLogger(__name__)
     logger.setLevel(level)
