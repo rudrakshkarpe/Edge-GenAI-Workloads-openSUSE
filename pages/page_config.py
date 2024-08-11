@@ -1,28 +1,26 @@
 import streamlit as st
 
 
-def set_page_header():
+def set_page_config():
     st.set_page_config(
-        page_title="🏠 Localization of LLMs",
-        page_icon="🏠",
-        layout="centered",
+        page_title="Local RAG",
+        page_icon="📚",
+        layout="wide",
         initial_sidebar_state=st.session_state["sidebar_state"],
         menu_items={
-            "Discussions": "https://github.com/rudrakshkarpe/Edge-GenAI-Workloads-openSUSE/issues"
+            "Get Help": "https://github.com/jonfairbanks/local-rag/discussions",
+            "Report a bug": "https://github.com/jonfairbanks/local-rag/issues",
         },
     )
 
-
-st.markdown(
-    r"""
-    
+    # Remove the Streamlit `Deploy` button from the Header
+    st.markdown(
+        r"""
     <style>
-    .stDeployButton{
-        visibility: hidden;
-    }
+    .stDeployButton {
+            visibility: hidden;
+        }
     </style>
     """,
-    
-    unsafe_allow_html=True,
-    
-)
+        unsafe_allow_html=True,
+    )
