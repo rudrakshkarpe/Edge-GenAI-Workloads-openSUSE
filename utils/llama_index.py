@@ -1,10 +1,12 @@
 import os
+
 import streamlit as st
 
 import utils.logs as logs
+
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-# NOT USED but kept for the reference
+# note: not used but required needs to be imported first
 os.environ["OPENAI_API_KEY"] = "sk-abc123"
 
 from llama_index.core import (
@@ -13,12 +15,14 @@ from llama_index.core import (
     Settings,
 )
 
-# embedding model set-up
+# setting up embeddings 
+
 
 @st.cache_resource(show_spinner=False)
 def setup_embedding_model(
     model: str,
 ):
+
     try:
         from torch import cuda
 
@@ -41,7 +45,8 @@ def setup_embedding_model(
         print(f"Failed to setup the embedding model: {err}")
 
 
-# loading documents
+# load documents 
+
 
 def load_documents(data_dir: str):
     
@@ -61,11 +66,11 @@ def load_documents(data_dir: str):
                 os.remove(file.path)
         logs.log.info(f"Document loading complete; removing local file(s)")
 
-
 # create document index 
 
 @st.cache_resource(show_spinner=False)
 def create_index(_documents):
+
 
     try:
         index = VectorStoreIndex.from_documents(
@@ -80,7 +85,7 @@ def create_index(_documents):
         raise Exception(f"Index creation failed: {err}")
 
 
-# geneate query engine
+# create query engine 
 
 # @st.cache_resource(show_spinner=False)
 def create_query_engine(_documents):
