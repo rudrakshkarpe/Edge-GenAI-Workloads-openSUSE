@@ -1,0 +1,32 @@
+# Use openSUSE Leap as the base image
+FROM opensuse/leap:15.6 as base
+
+FROM base AS python-deps
+
+# Install required packages including Python 3.10 and pip
+RUN zypper --non-interactive install \
+    gcc \
+    curl \
+    && zypper addrepo https://download.opensuse.org/repositories/devel:languages:python:Factory/15.6/devel:languages:python:Factory.repo \
+    && zypper refresh \
+    && zypper --non-interactive install python310 python310-pip \
+    && zypper clean --all
+
+# Install Python dependencies using requirements.txt
+COPY requirements.txt .
+RUN python3.10 -m pip install --no-cache-dir -r requirements.txt
+
+FROM base AS runtime
+
+# Install application into container
+COPY . .
+
+# Expose the Streamlit port
+EXPOSE 8501
+
+# Setup a health check against Streamlit
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+
+# Run the application
+ENTRYPOINT [ "python", "-m", "streamlit" ]
+CMD ["run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
