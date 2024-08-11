@@ -1,25 +1,62 @@
-import ollama 
+import ollama
 import os
 
 import streamlit as st
 
 import utils.logs as logs
 
-
-# NOT USED but kept for the reference
-os.environ["OPENAI_API_KEY"] = "sk-abc123" 
-
+# note: not used but required needs to be imported first
+os.environ["OPENAI_API_KEY"] = "sk-abc123"
 
 from llama_index.llms.ollama import Ollama
 from llama_index.core import Settings
 from llama_index.core.query_engine.retriever_query_engine import RetrieverQueryEngine
 
+# create ollama client
+
+def create_client(host: str):
+  
+    try:
+        client = ollama.Client(host=host)
+        logs.log.info("Ollama chat client created successfully")
+        return client
+    except Exception as err:
+        logs.log.error(f"Failed to create Ollama client: {err}")
+        return False
+
+
+# getting llm models
+
+def get_models():
+  
+    try:
+        chat_client = create_client(st.session_state["ollama_endpoint"])
+        data = chat_client.list()
+        models = []
+        for model in data["models"]:
+            models.append(model["name"])
+
+        st.session_state["ollama_models"] = models
+
+        if len(models) > 0:
+            logs.log.info("Ollama models loaded successfully")
+        else:
+            logs.log.warn(
+                "Ollama did not return any models. Make sure to download some!"
+            )
+
+        return models
+    except Exception as err:
+        logs.log.error(f"Failed to retrieve Ollama model list: {err}")
+        return []
+
+# create ollama instance
 
 @st.cache_data(show_spinner=False)
 def create_ollama_llm(
     model: str, base_url: str, system_prompt: str = None, request_timeout: int = 60
 ) -> Ollama:
-
+    
     try:
         # Settings.llm = Ollama(model=model, base_url=base_url, system_prompt=system_prompt, request_timeout=request_timeout)
         Settings.llm = Ollama(
@@ -33,6 +70,7 @@ def create_ollama_llm(
 
 
 def chat(prompt: str):
+
     try:
         llm = create_ollama_llm(
             st.session_state["selected_model"],
@@ -42,53 +80,18 @@ def chat(prompt: str):
         for chunk in stream:
             yield chunk.delta
     except Exception as err:
-        logs.log.error(f"Error in chat: {err}")
+        logs.log.error(f"Ollama chat stream error: {err}")
         return
 
+# create document chat
 
 def context_chat(prompt: str, query_engine: RetrieverQueryEngine):
+    
     try:
         stream = query_engine.query(prompt)
         for text in stream.response_gen:
+            # print(str(text), end="", flush=True)
             yield str(text)
     except Exception as err:
         logs.log.error(f"Ollama chat stream error: {err}")
         return
-
-
-# get clients
-
-def create_client(host: str):
-    try: 
-        
-        client = ollama.Client(host=host)
-        logs.log.info("Ollama chat client created successfully! 🚀")        
-        return client
-    except Exception as arr:
-        logs.log.error(f"Error creating Ollama chat client: {arr}")
-        return False
-
-
-# getting models
-
-def get_models():
-    try:
-        chat_client = create_client(host=Settings.OLLAMA_HOST)
-        data = chat_client.list()
-
-        models = []
-
-        for model in data["models"]:
-            models.append(model["name"])
-        st.session_state["ollama_models"] = models
-
-        if len(models) > 0:
-            logs.log.info(f"Models fetched successfully: {models}")
-
-        else:
-            logs.log.error("No models found! Make sure the Ollama server is running and you have it downloaded")
-        return models
-
-    except Exception as arr:
-        logs.log.error(f"Failed to retrieve Ollama model list: {arr}")
-        return [] 
