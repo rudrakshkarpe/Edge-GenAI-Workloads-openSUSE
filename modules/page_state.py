@@ -43,7 +43,7 @@ def set_initial_state():
         st.session_state["messages"] = [
             {
                 "role": "assistant",
-                "content": "Welcome to the project LLMs Localization! To begin, please import your local data in the supporting file formats",
+                "content": "Alright! Let's get started. Please upload your documents/images or provide a link to a Website/GitHub repository to begin.",
             }
         ]
 
