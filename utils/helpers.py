@@ -2,6 +2,10 @@ import os
 import json
 import requests
 import subprocess
+import requests
+import base64
+from io import BytesIO
+from PIL import Image
 
 import streamlit as st
 
@@ -67,3 +71,9 @@ def get_file_metadata(file_path):
                 return json.dumps(d, indent=2)
     except Exception:
         pass
+    
+# def img_to_base64(uploded_file):
+#     buffered = BytesIO()
+#     uploded_file.save(buffered, format="PNG")
+    
+#     return base64.b64encode(buffered.getvalue()).decode()
