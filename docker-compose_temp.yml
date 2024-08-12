@@ -1,0 +1,8 @@
+version: '3'
+services:
+  llm-localization:
+    image: rudrakshkarpe/gsoc-2024:latest
+    ports:
+      - 8501:8501
+    extra_hosts:
+      - 11434:11434

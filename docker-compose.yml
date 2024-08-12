@@ -1,0 +1,11 @@
+version: '3'
+services:
+  ollama-container:
+    image: ollama/ollama:latest
+    ports:
+      - 11443:11443
+    
+  streamlit-app:
+    image: rudrakshkarpe/gsoc-2024:latest
+    ports:
+      - 8501:8501
