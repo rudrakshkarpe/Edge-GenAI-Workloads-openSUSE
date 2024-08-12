@@ -13,6 +13,7 @@ streamlit-tags
 streamlit-extras
 black
 torch
-colorama ; sys_platform == 'win32'
+# colorama ; sys_platform == 'win32'
+colorama
 ebooklib
 llama-index-core
