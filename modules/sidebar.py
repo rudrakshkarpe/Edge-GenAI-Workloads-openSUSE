@@ -4,10 +4,9 @@ from elements.about import about
 from elements.sources import sources
 from elements.settings import settings
 
-
 def sidebar():
     with st.sidebar:
-        tab1, tab2, tab3 = st.sidebar.tabs(["About", "Sources", "Settings"])
+        tab1, tab2, tab3 = st.sidebar.tabs(["Files", "Models", "About"])
         with tab1:
             sources()
 
