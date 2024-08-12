@@ -4,3 +4,4 @@ LLM-Localization.log
 # elements/__pycache__/
 # utils/__pycache__/
 __pycache__/
+data/
