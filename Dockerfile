@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose the Streamlit port
-EXPOSE 8501
+EXPOSE 8502
 
 # Setup a health check against Streamlit
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
@@ -26,4 +26,4 @@ HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 # ENTRYPOINT ["python", "-m", "streamlit"]
 # CMD ["run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
-ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "main.py", "--server.port=8502", "--server.address=0.0.0.0"]
