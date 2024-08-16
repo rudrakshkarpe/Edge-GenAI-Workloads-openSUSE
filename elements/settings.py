@@ -74,17 +74,17 @@ def settings():
             "Model",
             [
                 "Default (bge-large-en-v1.5)",
-                "Large (Salesforce/SFR-Embedding-Mistral)",
-                "Other",
+                # "Large (Salesforce/SFR-Embedding-Mistral)",
+                # "Other",
             ],
             key="embedding_model",
         )
-        if embedding_model == "Other":
-            st.text_input(
-                "HuggingFace Model",
-                key="other_embedding_model",
-                placeholder="Salesforce/SFR-Embedding-Mistral",
-            )
+        # if embedding_model == "Other":
+        #     st.text_input(
+        #         "HuggingFace Model",
+        #         key="other_embedding_model",
+        #         placeholder="Salesforce/SFR-Embedding-Mistral",
+        #     )
         if st.session_state["advanced"] == True:
             st.caption(
                 "View the [MTEB Embeddings Leaderboard](https://huggingface.co/spaces/mteb/leaderboard)"
