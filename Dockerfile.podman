@@ -1,5 +1,7 @@
-FROM python:3.10-slim as base
+# Use openSUSE Leap as base image
+FROM registry.opensuse.org/opensuse/leap:15.6
 
+# Set Python environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONFAULTHANDLER=1 \
@@ -10,24 +12,34 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+# Install required packages including Python 3.10
+RUN zypper --non-interactive refresh && \
+    zypper --non-interactive install \
+        python310 \
+        python310-pip \
         gcc \
         curl \
-    && rm -rf /var/lib/apt/lists/*
+        git-core && \
+    zypper clean -a
 
+# Create symbolic links for python3.10
+RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
+    ln -sf /usr/bin/pip3.10 /usr/bin/pip
+
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Create non-root user
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8501
 
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
+# Remove healthcheck as it's not supported in OCI format
+# HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
-# Run the application
 CMD ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"] 
