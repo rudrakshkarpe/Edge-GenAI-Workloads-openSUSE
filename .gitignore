@@ -1,8 +1,12 @@
+# @python cache stuff
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+
+# @streamlit stuff
 .streamlit/
 LLM-Localization.log
-# modules/__pycache__/
-# elements/__pycache__/
-# utils/__pycache__/
-__pycache__/
 data/
 .venv/
