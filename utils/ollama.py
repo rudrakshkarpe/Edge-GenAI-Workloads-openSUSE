@@ -33,8 +33,8 @@ def get_models():
         chat_client = create_client(st.session_state["ollama_endpoint"])
         data = chat_client.list()
         models = []
-        for model in data["models"]:
-            models.append(model["name"])
+        for model in data['models']:
+            models.append(model['model'])
 
         st.session_state["ollama_models"] = models
 

@@ -1,8 +1,8 @@
 import streamlit as st
 
-from elements.local_files import local_files
-from elements.github_repo import github_repo
-from elements.website import website
+from components.local_files import local_files
+from components.github_repo import github_repo
+from components.website import website
 # from elements.multimodality import multimodality
 
 

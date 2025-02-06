@@ -1,8 +1,8 @@
 import streamlit as st
 
-from elements.about import about
-from elements.sources import sources
-from elements.settings import settings
+from components.about import about
+from components.sources import sources
+from components.settings import settings
 
 def sidebar():
     with st.sidebar:

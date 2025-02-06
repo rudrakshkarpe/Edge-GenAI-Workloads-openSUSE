@@ -14,7 +14,7 @@ from modules.page_state import set_initial_state
 def welcome_message(msg: str):
 
     for char in msg:
-        time.sleep(0.20)  # Sleep for 250 milliseconds
+        time.sleep(0.20) 
 
     st.markdown(
         f"<h1 style='text-align: center; color: #000000;'>{msg}</h1>",
@@ -22,8 +22,6 @@ def welcome_message(msg: str):
     )
 
     yield char
-
-
 
 set_initial_state()
 
