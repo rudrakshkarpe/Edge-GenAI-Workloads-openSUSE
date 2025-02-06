@@ -39,7 +39,4 @@ USER appuser
 
 EXPOSE 8501
 
-# Remove healthcheck as it's not supported in OCI format
-# HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
-
 CMD ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"] 

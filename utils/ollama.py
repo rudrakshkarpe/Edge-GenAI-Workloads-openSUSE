@@ -25,17 +25,17 @@ class OllamaChat:
         """Initialize the Ollama chat handler."""
         self.client = None
 
-    def create_client(self, host: str) -> Optional[ollama.Client]:
+    def create_client(self, base_url: str) -> Optional[ollama.Client]:
         """Create an Ollama client instance.
         
         Args:
-            host (str): The Ollama server host address
+            base_url (str): The Ollama server host address
             
         Returns:
             Optional[ollama.Client]: The created client or None if failed
         """
         try:
-            self.client = ollama.Client(host=host)
+            self.client = ollama.Client(base_url=base_url)
             logs.log.info("Ollama chat client created successfully")
             return self.client
         except Exception as err:
@@ -95,37 +95,39 @@ class OllamaChat:
 
 # getting llm models
 
-def get_models():
-  
-    try:
-        chat_client = OllamaChat().create_client(st.session_state["ollama_endpoint"])
-        data = chat_client.list()
-        models = []
-        for model in data['models']:
-            models.append(model['model'])
-
-        st.session_state["ollama_models"] = models
-
-        if len(models) > 0:
-            logs.log.info("Ollama models loaded successfully")
-        else:
-            logs.log.warn(
-                "Ollama did not return any models. Make sure to download some!"
-            )
-
-        return models
-    except Exception as err:
-        logs.log.error(f"Failed to retrieve Ollama model list: {err}")
-        return []
+def get_models(endpoint: Optional[str] = None):
+    """Get models from specified Ollama endpoint or try both system and container endpoints"""
+    models = []
+    endpoints = [
+        "http://localhost:11434",  # System Ollama
+        "http://localhost:11435",  # Container Ollama
+    ] if endpoint is None else [endpoint]
+    
+    for url in endpoints:
+        try:
+            chat_client = OllamaChat().create_client(url)
+            data = chat_client.list()
+            for model in data['models']:
+                models.append({
+                    'model': model['model'],
+                    'endpoint': url
+                })
+            logs.log.info(f"Successfully loaded models from {url}")
+        except Exception as err:
+            logs.log.warning(f"Failed to retrieve models from {url}: {err}")
+    
+    return models
 
 # create document chat
 
-def context_chat(prompt: str, query_engine: RetrieverQueryEngine):
-    
+def context_chat(prompt: str, query_engine: RetrieverQueryEngine, endpoint: str = None):
+    """Chat function that can use either Ollama instance"""
     try:
+        # Use the specified endpoint or default to system Ollama
+        endpoint = endpoint or "http://localhost:11434"
+        # Your existing chat code with endpoint configuration
         stream = query_engine.query(prompt)
         for text in stream.response_gen:
-            # print(str(text), end="", flush=True)
             yield str(text)
     except Exception as err:
         logs.log.error(f"Ollama chat stream error: {err}")

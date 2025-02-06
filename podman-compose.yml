@@ -4,22 +4,31 @@ services:
     image: docker.io/ollama/ollama:latest
     container_name: ollama-service
     ports:
-      - "11434:11434"
+      - "11435:11434"
     volumes:
       - ollama-data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     
   streamlit-app:
     build:
       context: .
       dockerfile: Dockerfile.podman
     image: localhost/rudrakshkarpe/gsoc-2024:latest
-    container_name: llm-localization-app
+    container_name: llm-app
     ports:
-      - "8501:8501"
+      - "8502:8501"
     environment:
       - OLLAMA_BASE_URL=http://ollama-container:11434
+      - NVIDIA_VISIBLE_DEVICES=all
     depends_on:
       - ollama-container
 
 volumes:
-  ollama-data: 
+  ollama-data:
+    driver: local 
