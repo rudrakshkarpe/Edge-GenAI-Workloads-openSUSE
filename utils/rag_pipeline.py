@@ -12,8 +12,16 @@ import utils.logs as logs
 
 
 def rag_pipeline(uploaded_files: list = None):
+    """Process documents through the RAG pipeline.
     
+    Args:
+        uploaded_files (list, optional): List of uploaded files to process
+        
+    Returns:
+        error: None if successful, Exception object if an error occurred
+    """
     error = None
+    ollama_chat = ollama.OllamaChat()
 
     # saving files to disk (optional)
 
@@ -28,11 +36,15 @@ def rag_pipeline(uploaded_files: list = None):
     # create llama index service context to use local embeddings 
 
     try:
-        llm = ollama.create_ollama_llm(
-            st.session_state["selected_model"],
-            st.session_state["ollama_endpoint"],
-            st.session_state["system_prompt"],
+        llm = ollama_chat.create_ollama_llm(
+            model=st.session_state["selected_model"],
+            base_url=st.session_state["ollama_endpoint"],
+            system_prompt=st.session_state.get("system_prompt", None)
         )
+        
+        if llm is None:
+            raise Exception("Failed to create LLM instance")
+            
         st.session_state["llm"] = llm
         st.caption("✔️ LLM Initialized")
 
@@ -44,25 +56,21 @@ def rag_pipeline(uploaded_files: list = None):
 
     # choose the embedding model
 
-    embedding_model = st.session_state["embedding_model"]
+    embedding_model = st.session_state.get("embedding_model", "Default (bge-large-en-v1.5)")
     hf_embedding_model = None
 
-    if embedding_model == None:
-        hf_embedding_model = "BAAI/bge-large-en-v1.5"
-
     if embedding_model == "Default (bge-large-en-v1.5)":
+        hf_embedding_model = "BAAI/bge-large-en-v1.5"
+    elif embedding_model == "Other":
+        hf_embedding_model = st.session_state.get("other_embedding_model", "BAAI/bge-large-en-v1.5")
+    else:
         hf_embedding_model = "BAAI/bge-large-en-v1.5"
 
     # if embedding_model == "Large (Salesforce/SFR-Embedding-Mistral)":
     #     hf_embedding_model = "Salesforce/SFR-Embedding-Mistral"
 
-    if embedding_model == "Other":
-        hf_embedding_model = st.session_state["other_embedding_model"]
-
     try:
-        llama_index.setup_embedding_model(
-            hf_embedding_model,
-        )
+        llama_index.setup_embedding_model(hf_embedding_model)
         st.caption("✔️ Embedding Model Created")
     except Exception as err:
         logs.log.error(f"Setting up Embedding Model failed: {str(err)}")
@@ -73,7 +81,7 @@ def rag_pipeline(uploaded_files: list = None):
     # choose files from local dir
 
     if (
-        st.session_state["documents"] is not None
+        st.session_state.get("documents") is not None
         and len(st.session_state["documents"]) > 0
     ):
         logs.log.info("Documents are already available; skipping document loading")
@@ -93,9 +101,7 @@ def rag_pipeline(uploaded_files: list = None):
     # create index from ingest documents 
 
     try:
-        llama_index.create_query_engine(
-            st.session_state["documents"],
-        )
+        llama_index.create_query_engine(st.session_state["documents"])
         st.caption("✔️ Created File Index")
     except Exception as err:
         logs.log.error(f"Index Creation Error: {str(err)}")
@@ -106,7 +112,7 @@ def rag_pipeline(uploaded_files: list = None):
     
     # remove files from data 
     
-    if len(st.session_state["file_list"]) > 0:
+    if len(st.session_state.get("file_list", [])) > 0:
         try:
             save_dir = os.getcwd() + "/data"
             shutil.rmtree(save_dir)

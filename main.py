@@ -1,36 +1,66 @@
+from typing import Generator
 import time
-
 import streamlit as st
 
-from modules.chatbox import chatbox
+from modules.chatbox import ChatBox
+from modules.header import PageHeader
+from modules.sidebar import Sidebar
+from modules.page_config import PageConfig
+from modules.page_state import PageState
 
-from modules.chatbox import chatbox
-from modules.header import set_page_header
-from modules.sidebar import sidebar
-from modules.page_config import set_page_config
-from modules.page_state import set_initial_state
+class LLMLocalizationApp:
+    """Main application class for LLM Localization.
+    
+    This class serves as the entry point for the Streamlit application and coordinates
+    all major components including the chat interface, sidebar, and page configuration.
+    """
 
+    def __init__(self):
+        """Initialize the application components."""
+        # Initialize state first
+        self.page_state = PageState()
+        self.page_state.initialize()  # Initialize state before other components
+        
+        # Then initialize other components
+        self.page_config = PageConfig()
+        self.header = PageHeader()
+        self.sidebar = Sidebar()
+        self.chatbox = ChatBox()
 
-def welcome_message(msg: str):
+    def display_welcome_message(self, msg: str) -> Generator[str, None, None]:
+        """Display an animated welcome message.
+        
+        Args:
+            msg (str): The message to display
+            
+        Yields:
+            str: Each character of the message for animation
+        """
+        for char in msg:
+            time.sleep(0.20)
+            st.markdown(
+                f"<h1 style='text-align: center; color: #000000;'>{msg}</h1>",
+                unsafe_allow_html=True,
+            )
+            yield char
 
-    for char in msg:
-        time.sleep(0.20) 
+    def run(self):
+        """Run the main application loop."""
+        # Initialize app state
+        self.page_state.initialize()
+        
+        # Configure page
+        self.page_config.configure()
+        self.header.render()
 
-    st.markdown(
-        f"<h1 style='text-align: center; color: #000000;'>{msg}</h1>",
-        unsafe_allow_html=True,
-    )
+        # Display existing messages
+        for msg in st.session_state["messages"]:
+            st.chat_message(msg["role"]).write(msg["content"])
 
-    yield char
+        # Setup sidebar and chat interface
+        self.sidebar.render()
+        self.chatbox.render()
 
-set_initial_state()
-
-set_page_config()
-set_page_header()
-
-
-for msg in st.session_state["messages"]:
-    st.chat_message(msg["role"]).write(msg["content"])
-
-sidebar()
-chatbox()
+if __name__ == "__main__":
+    app = LLMLocalizationApp()
+    app.run()
