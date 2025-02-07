@@ -13,7 +13,10 @@ from llama_index.core import (
     VectorStoreIndex,
     SimpleDirectoryReader,
     Settings,
+    Document,
 )
+
+from typing import Dict, List
 
 # setting up embeddings 
 
@@ -48,23 +51,38 @@ def setup_embedding_model(
 # load documents 
 
 
-def load_documents(data_dir: str):
-    
+def load_documents(data_dir: str, processed_docs: List[Dict]):
+    """Load documents with pre-processed chunks."""
     try:
-        files = SimpleDirectoryReader(input_dir=data_dir, recursive=True)
-        documents = files.load_data(files)
-        logs.log.info(f"Loaded {len(documents):,} documents from files")
+        documents = []
+        for doc in processed_docs:
+            if doc["format"] == "pdf":
+                for page in doc["content"]:
+                    for chunk in page["chunks"]:
+                        documents.append(Document(
+                            text=chunk,
+                            metadata={
+                                "source": doc["metadata"].get("title", ""),
+                                "page": page["page"],
+                                "format": doc["format"]
+                            }
+                        ))
+            else:
+                for content in doc["content"]:
+                    for chunk in content["chunks"]:
+                        documents.append(Document(
+                            text=chunk,
+                            metadata={
+                                "format": doc["format"],
+                                "headers": content.get("structured", {}).get("headers", [])
+                            }
+                        ))
+                        
+        logs.log.info(f"Loaded {len(documents):,} chunks from documents")
         return documents
     except Exception as err:
         logs.log.error(f"Error creating data index: {err}")
         raise Exception(f"Error creating data index: {err}")
-    finally:
-        for file in os.scandir(data_dir):
-            if file.is_file() and not file.name.startswith(
-                ".gitkeep"
-            ):  # TODO: Confirm syntax here
-                os.remove(file.path)
-        logs.log.info(f"Document loading complete; removing local file(s)")
 
 # create document index 
 

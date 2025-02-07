@@ -13,6 +13,7 @@ from llama_index.core import Settings
 from llama_index.core.query_engine.retriever_query_engine import RetrieverQueryEngine
 
 from typing import Generator, Optional
+from utils.vector_store import VectorStore
 
 class OllamaChat:
     """Handles interaction with the Ollama API for chat functionality.
@@ -120,13 +121,45 @@ def get_models():
 
 # create document chat
 
-def context_chat(prompt: str, query_engine: RetrieverQueryEngine):
-    
+def context_chat(prompt: str, vector_store: VectorStore) -> Generator[str, None, None]:
+    """Enhanced chat function with vector search."""
     try:
-        stream = query_engine.query(prompt)
-        for text in stream.response_gen:
-            # print(str(text), end="", flush=True)
-            yield str(text)
-    except Exception as err:
-        logs.log.error(f"Ollama chat stream error: {err}")
-        return
+        # Create embedding for the query
+        query_embedding = st.session_state["embedding_model"].get_text_embedding(prompt)
+        
+        # Get relevant context through vector search
+        search_results = vector_store.semantic_search(query_embedding, limit=3)
+        
+        # Format context for the LLM
+        context = "\n\n".join([
+            f"Context (from {r['document_title']}):\n{r['text']}"
+            for r in search_results
+        ])
+        
+        # Construct prompt with context
+        full_prompt = f"""Use the following context to answer the question. If you cannot answer based on the context, say so.
+
+{context}
+
+Question: {prompt}
+
+Answer:"""
+        
+        # Get streaming response from Ollama
+        response = ollama.chat(
+            model=st.session_state["selected_model"],
+            messages=[{"role": "user", "content": full_prompt}],
+            stream=True
+        )
+        
+        full_response = ""
+        for chunk in response:
+            if chunk and "content" in chunk:
+                full_response += chunk["content"]
+                yield chunk["content"]
+        
+        return full_response
+        
+    except Exception as e:
+        logs.log.error(f"Chat Error: {str(e)}")
+        yield f"An error occurred: {str(e)}"
