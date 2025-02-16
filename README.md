@@ -14,7 +14,6 @@ A retrieval augmented generation (RAG) platform with open-source Large Language 
 - [Development](#development)
 - [Containerization](#containerization)
 - [Contributing](#contributing)
-- [License](#license)
 
 </details>
 
@@ -47,7 +46,7 @@ This project enables local LLM deployment with RAG capabilities, specifically de
 </details>
 
 <details>
-<summary>Required Software</summary>
+<summary>Required Dependencies</summary>
 
 1. **Ollama Installation**
 ```bash
@@ -98,7 +97,7 @@ chmod +x start-containers.sh
 ./start-containers.sh
 
 # Access the application
-open http://localhost:8502
+open http://localhost:<your-port>
 ```
 </details>
 
@@ -123,9 +122,9 @@ Edge-GenAI-Workloads-openSUSE/
 <summary>Setting up Embeddings</summary>
 
 The project uses HuggingFace embeddings for document processing. The embedding setup is handled in:
-```python:utils/llama_index.py
-# startLine: 21
-# endLine: 44
+
+```bash
+utils/llama_index.py
 ```
 
 Key features:
@@ -143,9 +142,8 @@ ollama pull mistral
 ```
 
 2. The Ollama integration is managed in:
-```python:utils/ollama.py
-# startLine: 1
-# endLine: 66
+```bash
+utils/ollama.py
 ```
 
 3. Models are automatically detected and listed in the UI
@@ -156,17 +154,7 @@ ollama pull mistral
 
 The system supports multiple document sources:
 
-<!-- 1. GitHub Repositories:
-```python:components/github_repo.py
-startLine: 8
-endLine: 47
-```
-
-2. Websites:
-```python:components/website.py
-startLine: 17
-endLine: 56
-``` -->
+- "pdf", "txt", "doc", "docx"
 </details>
 
 ## Development

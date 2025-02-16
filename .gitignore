@@ -10,3 +10,4 @@ __pycache__/
 LLM-Localization.log
 data/
 .venv/
+.env*
