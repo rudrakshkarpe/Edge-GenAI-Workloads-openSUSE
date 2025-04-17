@@ -11,6 +11,25 @@ def settings():
     st.header("Settings")
     st.caption("Configure settings")
 
+    st.subheader("Ollama Settings")
+    ollama_settings = st.container(border=True)
+    with ollama_settings:
+        endpoint_type = st.radio(
+            "Select Ollama Instance",
+            options=["System Ollama (11434)", "Container Ollama (11435)"],
+            key="ollama_endpoint_type"
+        )
+        
+        # Set the appropriate endpoint based on selection
+        if endpoint_type == "System Ollama (11434)":
+            st.session_state["ollama_endpoint"] = "http://localhost:11434"
+        else:
+            st.session_state["ollama_endpoint"] = "http://localhost:11435"
+        
+        # Refresh models when endpoint changes
+        if st.button("Refresh Models"):
+            st.session_state["ollama_models"] = ollama.get_models(st.session_state["ollama_endpoint"])
+    
     st.subheader("Chat")
     chat_settings = st.container(border=True)
     with chat_settings:

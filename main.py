@@ -61,6 +61,16 @@ class LLMLocalizationApp:
         self.sidebar.render()
         self.chatbox.render()
 
-if __name__ == "__main__":
+def initialize_session_state():
+    if "ollama_endpoint" not in st.session_state:
+        st.session_state["ollama_endpoint"] = "http://localhost:11434"  # Default to system Ollama
+    if "ollama_models" not in st.session_state:
+        st.session_state["ollama_models"] = []
+
+def main():
+    initialize_session_state()
     app = LLMLocalizationApp()
     app.run()
+
+if __name__ == "__main__":
+    main()
